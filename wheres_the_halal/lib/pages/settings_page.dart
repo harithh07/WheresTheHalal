@@ -1,14 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:wheres_the_halal/pages/settings_page.dart';
+import 'package:wheres_the_halal/pages/home_page.dart';
+import 'package:wheres_the_halal/pages/auth_page.dart';
 
-class HomePage extends StatelessWidget {
-  HomePage({super.key});
+class SettingsPage extends StatelessWidget {
+
+  SettingsPage({super.key});
 
   final user = FirebaseAuth.instance.currentUser!;
 
-  // sign user out
-  void signUserOut() {
+    void signUserOut() {
     FirebaseAuth.instance.signOut();
   }
 
@@ -18,7 +19,14 @@ class HomePage extends StatelessWidget {
       backgroundColor: Colors.grey[300],
       appBar: AppBar(
         // Sign out button
-        actions: [IconButton(onPressed: signUserOut, icon: Icon(Icons.logout))],
+        actions: [IconButton(
+          onPressed: () {
+            Navigator.push(context, MaterialPageRoute(builder:(context) => AuthPage()));
+            signUserOut();
+          },
+          icon: Icon(Icons.logout)
+          )
+        ],
 
         // AppBar color and icon color/size
         backgroundColor: Colors.green[600],
@@ -28,6 +36,7 @@ class HomePage extends StatelessWidget {
           ),
         ),
 
+      // drawer menu
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.only(bottom: 100.0),
@@ -48,7 +57,7 @@ class HomePage extends StatelessWidget {
               title: const Text('Home'),
               onTap: () {
                 // update app state
-                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(builder:(context) => HomePage()));
               }
               
             ),
@@ -63,25 +72,25 @@ class HomePage extends StatelessWidget {
               title: const Text('Settings'),
               onTap: () {
                 // update app state
-                Navigator.push(context, MaterialPageRoute(builder:(context) => SettingsPage()));
+                Navigator.pop(context);
               }
             ),
           ]
         )
       ),
-
+      
       // Rest of homepage 
-      body: SafeArea(
+      body: const SafeArea(
         child: Center(
           child: Column(
             children: [
               // App name
               const SizedBox(height: 15.0),
               Text(
-                'Where\'s The Halal',
+                'Settings',
                 style: TextStyle(
-                  color: Colors.green[600],
-                  fontSize: 36.0,
+                  color: Colors.black,
+                  fontSize: 32.0,
                   fontWeight: FontWeight.bold
                 )
               ),
