@@ -28,7 +28,6 @@ class HomePage extends StatelessWidget {
           icon: Icon(Icons.logout)
           )
         ],
-
         // AppBar color and icon color/size
         backgroundColor: Colors.green[600],
         iconTheme: const IconThemeData( 
@@ -56,6 +55,7 @@ class HomePage extends StatelessWidget {
                 )
               ),
               const SizedBox(height: 225.0),
+              // TODO: rest of page
               Text(
                 'WIP',
                 style: TextStyle(fontSize: 50.0)

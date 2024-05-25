@@ -1,9 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:provider/provider.dart';
-import 'package:flutter/foundation.dart';
+
 
 class SearchPage extends StatefulWidget {
   const SearchPage({Key? key}) : super(key: key);
@@ -15,8 +12,6 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   final TextEditingController _textController = TextEditingController();
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final ScrollController _scrollController = ScrollController();
 
   final CollectionReference restaurantCollection = FirebaseFirestore.instance.collection('restaurants');
 
@@ -92,9 +87,9 @@ class _SearchPageState extends State<SearchPage> {
             ),
           child: TextField(
             controller: _textController,
-            
             decoration: InputDecoration(
               contentPadding: EdgeInsets.only(top: 4.0),
+              // search icon, unfocuses textfield when pressed
               prefixIcon: IconButton(
                 icon: Icon(
                   Icons.search_rounded,
@@ -102,6 +97,7 @@ class _SearchPageState extends State<SearchPage> {
                 ),
                 onPressed: () => FocusScope.of(context).unfocus(),
               ),
+              // undos whatever the user has searched
               suffixIcon: IconButton(
                   icon: Icon(
                     Icons.clear_rounded,
@@ -124,6 +120,7 @@ class _SearchPageState extends State<SearchPage> {
         itemCount: _resultList.length,
         itemBuilder: (context, index) {
           return ListTile(
+            // TODO: get images to display 
             leading: CircleAvatar(
               radius: 25.0,
               backgroundColor: Colors.grey,

@@ -21,6 +21,7 @@ class MenuDrawer extends StatelessWidget {
         child: ListView(
           padding: EdgeInsets.only(bottom: 100.0),
           children: [
+            // show user email
             Container(
               height: 175.0,
               child: DrawerHeader(
@@ -33,17 +34,16 @@ class MenuDrawer extends StatelessWidget {
                   ),
               ),
             ),
+            // home page
             ListTile(
               title: const Text('Home'),
               onTap: () {
                 // update app state
                 Navigator.push(context, MaterialPageRoute(builder:(context) => HomePage()));
-
-                
               }
-              
             ),
-              ListTile(
+            // search page
+            ListTile(
               title: const Text('Search'),
               onTap: () {
                 // update app state
@@ -51,6 +51,7 @@ class MenuDrawer extends StatelessWidget {
                 // Navigator.pop(context);
               }
             ),
+            // settings page
             ListTile(
               title: const Text('Settings'),
               onTap: () {

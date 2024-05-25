@@ -57,6 +57,7 @@ class SettingsPage extends StatelessWidget {
                 )
               ),
               const SizedBox(height: 225.0),
+              // TODO: Rest of page
               Text(
                 'WIP',
                 style: TextStyle(fontSize: 50.0)
