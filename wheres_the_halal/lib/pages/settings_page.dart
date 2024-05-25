@@ -8,6 +8,7 @@ class SettingsPage extends StatelessWidget {
   SettingsPage({super.key});
 
   final user = FirebaseAuth.instance.currentUser!;
+  final String pageName = 'Settings';
 
   void signUserOut() {
     FirebaseAuth.instance.signOut();
@@ -34,6 +35,7 @@ class SettingsPage extends StatelessWidget {
           color: Colors.black,
           size: 30.0
           ),
+        title: Text(pageName)
         ),
 
       // drawer menu

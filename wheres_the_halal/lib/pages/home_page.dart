@@ -7,6 +7,7 @@ class HomePage extends StatelessWidget {
   HomePage({super.key});
 
   final user = FirebaseAuth.instance.currentUser!;
+  final String pageName = 'Home';
 
   // sign user out
   void signUserOut() {
@@ -34,6 +35,7 @@ class HomePage extends StatelessWidget {
           color: Colors.black,
           size: 30.0
           ),
+        title: Text(pageName),
         ),
 
       drawer: MenuDrawer(),
