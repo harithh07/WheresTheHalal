@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:wheres_the_halal/components/login_textfield.dart';
 import 'package:wheres_the_halal/components/my_button.dart';
 import 'package:wheres_the_halal/components/square_tile.dart';
+import 'package:wheres_the_halal/services/auth_service.dart';
 
 class RegisterPage extends StatefulWidget {
   final Function()? onTap;
@@ -157,9 +158,11 @@ class _RegisterPageState extends State<RegisterPage> {
               const SizedBox(height: 30),
             
               // google sign in button
-              const Center(
+              Center(
                   child: SquareTile(
-                      imagePath: 'lib/images/google.png', height: 64.0)),
+                      onTap: () => AuthService().signInWithGoogle(),
+                      imagePath: 'lib/images/google.png', height: 64.0
+                      )),
             
               const SizedBox(height: 50),
             
