@@ -39,7 +39,7 @@ class SettingsPage extends StatelessWidget {
         ),
 
       // drawer menu
-      drawer: MenuDrawer(),
+      drawer: MenuDrawer(pageName),
       
       // Rest of homepage 
       body: const SafeArea(

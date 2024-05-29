@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:wheres_the_halal/pages/restaurants_near_me_page.dart';
 import 'package:wheres_the_halal/pages/settings_page.dart';
 import 'package:wheres_the_halal/pages/home_page.dart';
 import 'package:wheres_the_halal/pages/search_page.dart';
@@ -7,10 +8,13 @@ import 'package:wheres_the_halal/pages/search_page.dart';
 class MenuDrawer extends StatelessWidget {
 
   final user = FirebaseAuth.instance.currentUser!;
+  final String pageName;
 
-  MenuDrawer({
-    super.key,
-  });
+  MenuDrawer(
+    this.pageName, 
+    {super.key}
+  );
+  
 
   // TODO: Update drawer such that opening a page does not
   // create a new instance eg. pressing Home when already at
@@ -39,7 +43,23 @@ class MenuDrawer extends StatelessWidget {
               title: const Text('Home'),
               onTap: () {
                 // update app state
-                Navigator.push(context, MaterialPageRoute(builder:(context) => HomePage()));
+                if (pageName == 'Home') {
+                  Navigator.pop(context);
+                } else {
+                  Navigator.push(context, MaterialPageRoute(builder:(context) => HomePage()));
+                }
+              }
+            ),
+            // Restaurants near me page
+            ListTile(
+              title: const Text('Restaurants Near Me'),
+              onTap: () {
+                // update app state
+                if (pageName == 'Restaurants Near Me') {
+                  Navigator.pop(context);
+                } else {
+                  Navigator.push(context, MaterialPageRoute(builder:(context) => RestaurantsNearMePage()));
+                }
               }
             ),
             // search page
@@ -47,16 +67,24 @@ class MenuDrawer extends StatelessWidget {
               title: const Text('Search'),
               onTap: () {
                 // update app state
-                Navigator.push(context, MaterialPageRoute(builder:(context) => SearchPage()));
-                // Navigator.pop(context);
+                if (pageName == 'Search') {
+                  Navigator.pop(context);
+                } else {
+                  Navigator.push(context, MaterialPageRoute(builder:(context) => SearchPage()));
+                }
               }
             ),
+              
             // settings page
             ListTile(
               title: const Text('Settings'),
               onTap: () {
                 // update app state
-                Navigator.push(context, MaterialPageRoute(builder:(context) => SettingsPage()));
+                if (pageName == 'Settings') {
+                  Navigator.pop(context);
+                } else {
+                  Navigator.push(context, MaterialPageRoute(builder:(context) => SettingsPage()));
+                }
               }
             ),
           ]
