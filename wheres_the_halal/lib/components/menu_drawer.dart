@@ -51,17 +51,17 @@ class MenuDrawer extends StatelessWidget {
               }
             ),
             // Restaurants near me page
-            ListTile(
-              title: const Text('Restaurants Near Me'),
-              onTap: () {
-                // update app state
-                if (pageName == 'Restaurants Near Me') {
-                  Navigator.pop(context);
-                } else {
-                  Navigator.push(context, MaterialPageRoute(builder:(context) => RestaurantsNearMePage()));
-                }
-              }
-            ),
+            // ListTile(
+            //   title: const Text('Restaurants Near Me'),
+            //   onTap: () {
+            //     // update app state
+            //     if (pageName == 'Restaurants Near Me') {
+            //       Navigator.pop(context);
+            //     } else {
+            //       Navigator.push(context, MaterialPageRoute(builder:(context) => RestaurantsNearMePage()));
+            //     }
+            //   }
+            // ),
             // search page
             ListTile(
               title: const Text('Search'),
