@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:wheres_the_halal/components/menu_drawer.dart';
 
 
 class SearchPage extends StatefulWidget {
@@ -14,6 +15,7 @@ class _SearchPageState extends State<SearchPage> {
   final TextEditingController _textController = TextEditingController();
 
   final CollectionReference restaurantCollection = FirebaseFirestore.instance.collection('restaurants');
+  final String pageName = "Search";
 
   List _allResults = [];
   List _resultList = [];
@@ -75,9 +77,14 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: MenuDrawer(pageName),
       backgroundColor: Colors.grey[300],
       appBar: AppBar(
         backgroundColor: Colors.green,
+        iconTheme: const IconThemeData(
+          color: Colors.black,
+          size: 30.0
+        ),
         // searchbar
         title: Container(
           height: 40.0,
