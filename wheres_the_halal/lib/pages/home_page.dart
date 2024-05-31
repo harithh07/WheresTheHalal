@@ -57,8 +57,8 @@ class HomePage extends StatelessWidget {
               const SizedBox(height: 225.0),
               // TODO: rest of page
               Text(
-                'WIP',
-                style: TextStyle(fontSize: 50.0)
+                'Welcome ' + user.email! + "!",
+                style: TextStyle(fontSize: 24.0)
               )
 
             ]
