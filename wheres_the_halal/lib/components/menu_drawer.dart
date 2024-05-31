@@ -29,14 +29,14 @@ class MenuDrawer extends StatelessWidget {
                 child: Text(
                   'Logged in as: ' + user.email!,
                   style: TextStyle(
-                    fontWeight: FontWeight.bold
+                    fontWeight: FontWeight.bold,
                     )
                   ),
               ),
             ),
             // home page
             ListTile(
-              title: const Text('Home'),
+              title: const Text('Restaurant\'s Near Me'),
               onTap: () {
                 // update app state
                 Navigator.push(context, MaterialPageRoute(builder:(context) => HomePage()));
