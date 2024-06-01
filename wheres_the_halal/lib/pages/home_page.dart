@@ -56,11 +56,18 @@ class HomePage extends StatelessWidget {
               ),
               const SizedBox(height: 225.0),
               // TODO: rest of page
-              Text(
-                'Welcome ' + user.email! + "!",
-                style: TextStyle(fontSize: 24.0)
+              Center(
+                child: Text(
+                  'Welcome',
+                  style: TextStyle(fontSize: 24.0)
+                ),
+              ),
+              Center(
+                child: Text(
+                  user.email! + "!",
+                  style: TextStyle(fontSize: 24.0)
+                )
               )
-
             ]
           ),
           )
