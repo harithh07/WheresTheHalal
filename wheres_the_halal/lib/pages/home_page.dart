@@ -45,7 +45,7 @@ class HomePage extends StatelessWidget {
           ),
         ),
 
-      drawer: MenuDrawer(),
+      drawer: MenuDrawer(pageName),
 
       // Rest of homepage 
       body: SafeArea(
