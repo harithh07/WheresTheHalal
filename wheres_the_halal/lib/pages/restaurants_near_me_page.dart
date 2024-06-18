@@ -84,6 +84,7 @@ class _RestaurantsNearMePageState extends State<RestaurantsNearMePage> {
           ),
         title: Text(pageName)
       ),
+
       // set camera to current position
       body: _currentPosition == null
        ? const Center(
