@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:wheres_the_halal/pages/profile_page.dart';
 import 'package:wheres_the_halal/pages/restaurants_near_me_page.dart';
 import 'package:wheres_the_halal/pages/settings_page.dart';
 import 'package:wheres_the_halal/pages/home_page.dart';
@@ -51,17 +52,17 @@ class MenuDrawer extends StatelessWidget {
               }
             ),
             // Restaurants near me page
-            // ListTile(
-            //   title: const Text('Restaurants Near Me'),
-            //   onTap: () {
-            //     // update app state
-            //     if (pageName == 'Restaurants Near Me') {
-            //       Navigator.pop(context);
-            //     } else {
-            //       Navigator.push(context, MaterialPageRoute(builder:(context) => RestaurantsNearMePage()));
-            //     }
-            //   }
-            // ),
+            ListTile(
+              title: const Text('Restaurants Near Me'),
+              onTap: () {
+                // update app state
+                if (pageName == 'Restaurants Near Me') {
+                  Navigator.pop(context);
+                } else {
+                  Navigator.push(context, MaterialPageRoute(builder:(context) => RestaurantsNearMePage()));
+                }
+              }
+            ),
             // search page
             ListTile(
               title: const Text('Search'),
@@ -71,6 +72,19 @@ class MenuDrawer extends StatelessWidget {
                   Navigator.pop(context);
                 } else {
                   Navigator.push(context, MaterialPageRoute(builder:(context) => SearchPage()));
+                }
+              }
+            ),
+            
+            // Profile page
+            ListTile(
+              title: const Text('Profile'),
+              onTap: () {
+                // update app state
+                if (pageName == 'Profile') {
+                  Navigator.pop(context);
+                } else {
+                  Navigator.push(context, MaterialPageRoute(builder:(context) => ProfilePage()));
                 }
               }
             ),
