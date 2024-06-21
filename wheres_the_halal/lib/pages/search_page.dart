@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:wheres_the_halal/components/menu_drawer.dart';
+import 'package:wheres_the_halal/components/restaurant.dart';
 import 'package:wheres_the_halal/pages/filter_page.dart';
+import 'package:wheres_the_halal/pages/restaurant_page.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 
 class SearchPage extends StatefulWidget {
@@ -171,7 +174,15 @@ class _SearchPageState extends State<SearchPage> {
             title: Text(_resultList[index]['name'],),
             subtitle: Text(_resultList[index]['location']),
             trailing: Text(_resultList[index]['cuisine']),
-            onTap: () => print(_resultList[index]['name'] + ' ' + _resultList[index]['location'])
+            onTap: () => 
+              Navigator.push(context, MaterialPageRoute(builder: (context) => 
+                RestaurantPage(restaurant: Restaurant(
+                  name: _resultList[index]['name'], 
+                  cuisine: _resultList[index]['cuisine'], 
+                  address: _resultList[index]['address'],
+                  location: _resultList[index]['location'], 
+                  geolocation: _resultList[index]['geolocation'])))
+                )
           );
         },
       )

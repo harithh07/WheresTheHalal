@@ -56,7 +56,7 @@ class _ProfilePageState extends State<ProfilePage> {
           TextButton(
             child: Text(
               'Cancel',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.white, fontSize: 16.0),
             ),
             onPressed: () => Navigator.pop(context),
           ),
@@ -64,7 +64,7 @@ class _ProfilePageState extends State<ProfilePage> {
           TextButton(
             child: Text(
               'Save',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.white, fontSize: 16.0),
             ),
             onPressed: () => Navigator.of(context).pop(newVal),
           ),
