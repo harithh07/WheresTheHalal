@@ -126,16 +126,17 @@ class _RestaurantPageState extends State<RestaurantPage> {
                   onMapCreated: ((GoogleMapController controller) => _mapController.complete(controller)),
                   initialCameraPosition: CameraPosition(
                     target: LatLng(widget.restaurant.geolocation.latitude, widget.restaurant.geolocation.longitude),
-                    zoom: 16
+                    zoom: 17
                   ),
                   markers: {
                     Marker(
                       markerId: MarkerId(widget.restaurant.name),
                       position: LatLng(widget.restaurant.geolocation.latitude, widget.restaurant.geolocation.longitude),
-                      icon: BitmapDescriptor.defaultMarker
+                      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan)
                       
                     )
                   },
+                  myLocationButtonEnabled: false,
                   
                 ),
               )
