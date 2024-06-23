@@ -4,7 +4,6 @@ import 'package:wheres_the_halal/components/menu_drawer.dart';
 import 'package:wheres_the_halal/components/restaurant.dart';
 import 'package:wheres_the_halal/pages/filter_page.dart';
 import 'package:wheres_the_halal/pages/restaurant_page.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 
 class SearchPage extends StatefulWidget {
