@@ -19,8 +19,6 @@ class RestaurantDataFetch {
   static Future<List> getRestaurantsInRadius(double radius, LatLng currentPosition) async {
     List nearbyResults = [];
 
-    
-
     if (allResults.isEmpty) {
       return [];
     }

@@ -104,17 +104,17 @@ class MenuDrawer extends StatelessWidget {
             ),
 
             // testing page
-            ListTile(
-              title: const Text('testing'),
-              onTap: () {
-                // update app state
-                if (pageName == 'testing') {
-                  Navigator.pop(context);
-                } else {
-                  Navigator.push(context, MaterialPageRoute(builder:(context) => MapPage()));
-                }
-              }
-            ),
+            // ListTile(
+            //   title: const Text('testing'),
+            //   onTap: () {
+            //     // update app state
+            //     if (pageName == 'testing') {
+            //       Navigator.pop(context);
+            //     } else {
+            //       Navigator.push(context, MaterialPageRoute(builder:(context) => MapPage()));
+            //     }
+            //   }
+            // ),
 
             
           ]

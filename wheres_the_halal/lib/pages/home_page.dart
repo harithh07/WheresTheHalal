@@ -25,6 +25,7 @@ class _HomePageState extends State<HomePage> {
   final Completer<GoogleMapController> _mapController = Completer();
   LatLng? _currentPosition;
   List? nearbyRestaurants;
+  Set<Marker> _markers = {};
 
   final String pageName = 'Home';
 
@@ -74,17 +75,44 @@ class _HomePageState extends State<HomePage> {
       _currentPosition = LatLng(pos.latitude, pos.longitude);
     });
 
-    fetchNearbyRestaurants();
+    await fetchNearbyRestaurants();
+    await fetchMarkers();
 
   }
 
   // fetches list of restaurants in a 3km radius from user
   Future<void> fetchNearbyRestaurants() async {
+    print("fetching neaby restaurants");
     await RestaurantDataFetch.getClientStream();
     List temp = await RestaurantDataFetch.getRestaurantsInRadius(3000, _currentPosition!);
 
     setState(() {
       nearbyRestaurants = temp;
+    });
+  }
+
+  //fetches the markers of the restaurants within 3km radius
+  Future<void> fetchMarkers() async {
+    print("fetching markers");
+    Set<Marker> markerSet = {};
+
+    await RestaurantDataFetch.getClientStream();
+    List temp = await RestaurantDataFetch.getRestaurantsInRadius(3000, _currentPosition!);
+
+    for (var restaurant in temp) {
+      markerSet.add(
+        Marker(
+          markerId: MarkerId(restaurant['name']),
+          position: LatLng(restaurant['geolocation'].latitude, restaurant['geolocation'].longitude),
+          infoWindow: InfoWindow(
+            title: restaurant['name'],
+            snippet: restaurant['location']
+          )
+      ));
+    }
+    print("Markers fetched: ${markerSet.length}");
+    setState(() {
+      _markers = markerSet;
     });
   }
 
@@ -150,9 +178,9 @@ class _HomePageState extends State<HomePage> {
                                 _mapController.complete(controller)),
                             initialCameraPosition: CameraPosition(
                                 target: _currentPosition!, zoom: 16),
-                            markers: {
+                            markers: _markers
                               // TODO: insert list of nearby restaurants as markers here
-                            },
+                            ,
                             myLocationEnabled: true,
                             myLocationButtonEnabled: true,
                             scrollGesturesEnabled: true,
