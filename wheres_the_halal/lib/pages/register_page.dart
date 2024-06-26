@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:wheres_the_halal/components/login_textfield.dart';
@@ -34,16 +35,25 @@ class _RegisterPageState extends State<RegisterPage> {
     // try creating user
     try {
       if (passwordController.text == confirmPasswordController.text) {
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: emailController.text,
           password: passwordController.text,
         );
+
+        // add user to firebase
+        FirebaseFirestore.instance.collection("Users")
+          .doc(userCredential.user!.email)
+          .set({
+            'username': emailController.text.split('@')[0], // initial username
+          });
+        Navigator.pop(context);
       } else {
         // show error message
-        showErrorMessage("passwords dont match!");
+        Navigator.pop(context);
+        showErrorMessage("Passwords do not match!");
+
       }
       // pop loading circle
-      Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
       // pop loading circle
       Navigator.pop(context);

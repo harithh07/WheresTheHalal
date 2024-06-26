@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:wheres_the_halal/components/menu_drawer.dart';
+import 'package:wheres_the_halal/components/restaurant.dart';
+import 'package:wheres_the_halal/pages/filter_page.dart';
+import 'package:wheres_the_halal/pages/restaurant_page.dart';
 
 
 class SearchPage extends StatefulWidget {
@@ -19,6 +22,8 @@ class _SearchPageState extends State<SearchPage> {
 
   List _allResults = [];
   List _resultList = [];
+  List cuisinesList = [];
+  List selectedCuisines = [];
 
   getClientStream() async {
     // order restaurants by name, then by location name
@@ -42,8 +47,18 @@ class _SearchPageState extends State<SearchPage> {
     if (_textController != '') {
       for (var clientSnapshot in _allResults) {
         var name = clientSnapshot['name'].toString().toLowerCase();
-        if (name.contains(_textController.text.toLowerCase())) {
-          showResults.add(clientSnapshot);
+        var cuisine = clientSnapshot['cuisine'];
+        if (!cuisinesList.contains(cuisine)) {
+          cuisinesList.add(cuisine);
+        }
+        if (!selectedCuisines.isEmpty) {
+          if (name.contains(_textController.text.toLowerCase()) && selectedCuisines.contains(cuisine)) {
+            showResults.add(clientSnapshot);
+          }
+        } else {
+          if (name.contains(_textController.text.toLowerCase())) {
+            showResults.add(clientSnapshot);
+          }
         }
       }
     } else {
@@ -53,6 +68,13 @@ class _SearchPageState extends State<SearchPage> {
     setState(() {
       _resultList = showResults;
     });
+  }
+
+  // function to open filter page and pass all unique cuisines and currently filtered cuisines 
+  Future<void> filterResults(BuildContext context) async {
+    final filters = await Navigator.push(context, MaterialPageRoute(builder: (context) => FilterPage(cuisines: cuisinesList, filters: selectedCuisines,)));
+    selectedCuisines = filters;
+    searchResultList();
   }
 
   @override
@@ -85,6 +107,20 @@ class _SearchPageState extends State<SearchPage> {
           color: Colors.black,
           size: 30.0
         ),
+        actions: [
+          // filter button
+          Builder(
+            builder: (context) {
+              return IconButton(
+                  // opens filter page
+                  onPressed: () => filterResults(context), //Scaffold.of(context).openEndDrawer(),
+                  icon: Icon(Icons.filter_alt_rounded),
+                  iconSize: 36,
+                );
+            }
+          ),
+            
+        ],
         // searchbar
         title: Container(
           height: 40.0,
@@ -123,19 +159,29 @@ class _SearchPageState extends State<SearchPage> {
         )
       ),
       // list of restaurants
-      body: ListView.builder(
+      body: ListView.separated(
+        separatorBuilder: (BuildContext context, int index) => 
+          const Divider(color: Colors.black, thickness: 0.5, height: 0.0),
         itemCount: _resultList.length,
         itemBuilder: (context, index) {
           return ListTile(
             // TODO: get images to display 
-            leading: CircleAvatar(
-              radius: 25.0,
-              backgroundColor: Colors.grey,
-            ),
+            // leading: CircleAvatar(
+            //   radius: 25.0,
+            //   backgroundColor: Colors.grey,
+            // ),
             title: Text(_resultList[index]['name'],),
             subtitle: Text(_resultList[index]['location']),
             trailing: Text(_resultList[index]['cuisine']),
-            onTap: () => print(_resultList[index]['name'] + ' ' + _resultList[index]['location'])
+            onTap: () => 
+              Navigator.push(context, MaterialPageRoute(builder: (context) => 
+                RestaurantPage(restaurant: Restaurant(
+                  name: _resultList[index]['name'], 
+                  cuisine: _resultList[index]['cuisine'], 
+                  address: _resultList[index]['address'],
+                  location: _resultList[index]['location'], 
+                  geolocation: _resultList[index]['geolocation'])))
+                )
           );
         },
       )

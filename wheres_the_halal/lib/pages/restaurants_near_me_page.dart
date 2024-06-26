@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:location/location.dart';
 import 'package:wheres_the_halal/components/menu_drawer.dart';
 
 class RestaurantsNearMePage extends StatefulWidget {
@@ -13,7 +13,6 @@ class RestaurantsNearMePage extends StatefulWidget {
 }
 
 class _RestaurantsNearMePageState extends State<RestaurantsNearMePage> {
-  final _locationController = Location();
   final Completer<GoogleMapController> _mapController = Completer();
   final String pageName = 'Restaurants Near Me';
 
@@ -29,47 +28,51 @@ class _RestaurantsNearMePageState extends State<RestaurantsNearMePage> {
   // get the user's current location
   Future<void> fetchLocationUpdates() async {
     bool _serviceEnabled;
-    PermissionStatus permissionGranted;
+    // PermissionStatus permissionGranted;
+    LocationPermission permission;
 
-    _serviceEnabled = await _locationController.serviceEnabled();
-    if (_serviceEnabled) {
-      _serviceEnabled = await _locationController.requestService();
-    } else {
-      return;
+    _serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!_serviceEnabled) {
+      return Future.error('Location services are disabled');
     }
 
-    permissionGranted = await _locationController.hasPermission();
-    if (permissionGranted == PermissionStatus.denied) {
-      permissionGranted = await _locationController.requestPermission();
-      if (permissionGranted != PermissionStatus.granted) {
-        return;
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Error');
       }
     }
 
-    _locationController.onLocationChanged.listen((LocationData currentLocation) {
-      if (currentLocation.latitude != null && currentLocation.longitude != null) {
-        setState(() {
-          _currentPosition = LatLng(currentLocation.latitude!, currentLocation.longitude!);
-          _cameraToPosition(_currentPosition!);
-        });
-      }
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error('Perm disabled');
+    }
+
+    Position pos = await Geolocator.getCurrentPosition();
+
+    setState(() {
+      _currentPosition = LatLng(pos.latitude, pos.longitude);
     });
   }
+    
 
   // centre the camera on the user's current location when moving
   Future<void> _cameraToPosition(LatLng pos) async {
     final GoogleMapController controller = await _mapController.future;
     CameraPosition _newCameraPosition = CameraPosition(
       target: pos, 
-      zoom: 16
+      zoom: await controller.getZoomLevel()
     );
     await controller.animateCamera(
       CameraUpdate.newCameraPosition(_newCameraPosition), 
     );
   }
 
+  void _updatePosition() {
+    fetchLocationUpdates();
+    _cameraToPosition(_currentPosition!);
+  }
 
-  // BUG: page fails to load when app is first opened until hot restarted, or when page is reopened from drawer
   @override
   Widget build(BuildContext context) {
     
@@ -82,7 +85,22 @@ class _RestaurantsNearMePageState extends State<RestaurantsNearMePage> {
           color: Colors.black,
           size: 30.0
           ),
-        title: Text(pageName)
+        title: Text(pageName),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 4.0),
+            child: Builder(
+              builder: (context) {
+                return IconButton(
+                    // opens filter page
+                    onPressed: () => _updatePosition(), //Scaffold.of(context).openEndDrawer(),
+                    icon: Icon(Icons.refresh),
+                    iconSize: 36,
+                  );
+              }
+            ),
+          ),
+        ],
       ),
 
       // set camera to current position
@@ -98,13 +116,15 @@ class _RestaurantsNearMePageState extends State<RestaurantsNearMePage> {
         ),
         markers: {
           // place marker at current position
-          Marker(
-            markerId: MarkerId("source"),
-            position: _currentPosition!,
-            icon: BitmapDescriptor.defaultMarker
-            
-          )
-        }
+          // Marker(
+          //   markerId: MarkerId("currentPosition"),
+          //   position: _currentPosition!,
+          //   icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+          // )
+        },
+        myLocationEnabled: true,
+        myLocationButtonEnabled: true,
+        
       )
     );
     
