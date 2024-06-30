@@ -96,6 +96,7 @@ class _HomePageState extends State<HomePage> {
           // Sign out button
           actions: [
             IconButton(
+              key: Key('signout_button'),
                 onPressed: () {
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => AuthPage()));
@@ -132,9 +133,13 @@ class _HomePageState extends State<HomePage> {
               // if current position is still null, display a loading circle until it is not null
               // if not null, display google maps widget
               _currentPosition == null
-                  ? const Center(
+                  ? Center(
+                    child: Container(
+                      width: double.infinity,
+                      height: 300,
                       child: CircularProgressIndicator(color: Colors.black),
-                    )
+                    ),
+                  )
                   : Container(
                       width: double.infinity,
                       height: 300,
@@ -183,7 +188,12 @@ class _HomePageState extends State<HomePage> {
 
               // displays list of nearby restaurants
               nearbyRestaurants == null ? 
-                Center(child: CircularProgressIndicator()) :
+                Center(
+                  // child: Container(
+                  //   height: 50,
+                  //   child: CircularProgressIndicator(),
+                  // ),
+                ) :
                 Container(
                   height: 250,
                   child: ListView.separated(

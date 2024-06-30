@@ -91,6 +91,7 @@ class _LoginPageState extends State<LoginPage> {
             
               // email textfield
               LoginTextfield(
+                key: Key('email_controller'),
                 controller: emailController,
                 hintText: 'Email',
                 obscureText: false,
@@ -100,6 +101,7 @@ class _LoginPageState extends State<LoginPage> {
             
               // password textfield
               LoginTextfield(
+                key: Key('pw_controller'),
                 controller: passwordController,
                 hintText: 'Password',
                 obscureText: true,
@@ -114,12 +116,13 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     GestureDetector(
+                      key: Key('forgot_pw_button'),
                       onTap: (){
                         Navigator.push(
                           context, 
                           MaterialPageRoute(
                             builder: (context){
-                              return ForgotPasswordPage();;
+                              return ForgotPasswordPage();
                             },
                           ),
                         );
@@ -142,7 +145,8 @@ class _LoginPageState extends State<LoginPage> {
             
               MyButton(
                 text: "Sign In",
-                onTap: signUserIn
+                onTap: signUserIn,
+                key: Key('signin_button')
                 ),
             
               const SizedBox(height: 30),
