@@ -7,6 +7,7 @@ import 'package:wheres_the_halal/pages/auth_page.dart';
 import 'package:wheres_the_halal/components/menu_drawer.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:wheres_the_halal/pages/restaurant_page.dart';
 import 'dart:async';
 
 import 'package:wheres_the_halal/services/restaurant_data_fetch.dart';
@@ -26,6 +27,7 @@ class _HomePageState extends State<HomePage> {
   LatLng? _currentPosition;
   List? nearbyRestaurants;
   Set<Marker> _markers = {};
+  bool locationDisabled = false;
 
   final String pageName = 'Home';
 
@@ -34,7 +36,6 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     fetchLocationUpdates();
   }
-
 
   // @override
   // void didChangeDependencies() {
@@ -61,30 +62,40 @@ class _HomePageState extends State<HomePage> {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
+        setState(() {
+          locationDisabled = true;
+        });
         return Future.error('Location permissions are denied');
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
+      setState(() {
+        locationDisabled = true;
+      });
       return Future.error('Location permissions are permanently denied');
     }
 
     Position pos = await Geolocator.getCurrentPosition();
-    
+
     setState(() {
+      locationDisabled = false;
       _currentPosition = LatLng(pos.latitude, pos.longitude);
     });
 
     await fetchNearbyRestaurants();
     await fetchMarkers();
-
   }
 
   // fetches list of restaurants in a 3km radius from user
   Future<void> fetchNearbyRestaurants() async {
+    setState(() {
+      nearbyRestaurants = [];
+    });
     print("fetching neaby restaurants");
     await RestaurantDataFetch.getClientStream();
-    List temp = await RestaurantDataFetch.getRestaurantsInRadius(3000, _currentPosition!);
+    List temp = await RestaurantDataFetch.getRestaurantsInRadius(
+        3000, _currentPosition!);
 
     setState(() {
       nearbyRestaurants = temp;
@@ -97,18 +108,16 @@ class _HomePageState extends State<HomePage> {
     Set<Marker> markerSet = {};
 
     await RestaurantDataFetch.getClientStream();
-    List temp = await RestaurantDataFetch.getRestaurantsInRadius(3000, _currentPosition!);
+    List temp = await RestaurantDataFetch.getRestaurantsInRadius(
+        3000, _currentPosition!);
 
     for (var restaurant in temp) {
-      markerSet.add(
-        Marker(
-          markerId: MarkerId(restaurant['name']),
-          position: LatLng(restaurant['geolocation'].latitude, restaurant['geolocation'].longitude),
+      markerSet.add(Marker(
+          markerId: MarkerId(restaurant.name),
+          position: LatLng(restaurant.geolocation.latitude,
+              restaurant.geolocation.longitude),
           infoWindow: InfoWindow(
-            title: restaurant['name'],
-            snippet: restaurant['location']
-          )
-      ));
+              title: restaurant.name, snippet: restaurant.location)));
     }
     print("Markers fetched: ${markerSet.length}");
     setState(() {
@@ -124,7 +133,7 @@ class _HomePageState extends State<HomePage> {
           // Sign out button
           actions: [
             IconButton(
-              key: Key('signout_button'),
+                key: Key('signout_button'),
                 onPressed: () {
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => AuthPage()));
@@ -157,17 +166,56 @@ class _HomePageState extends State<HomePage> {
                         fontWeight: FontWeight.bold)),
               ),
               const SizedBox(height: 25),
-              // check if current position has been obtained
+              // check if location services are denied
+              // if denied, display button to open location settings
+              // if not, check if current position has been obtained
               // if current position is still null, display a loading circle until it is not null
               // if not null, display google maps widget
-              _currentPosition == null
-                  ? Center(
-                    child: Container(
-                      width: double.infinity,
-                      height: 300,
-                      child: CircularProgressIndicator(color: Colors.black),
+              locationDisabled
+              ? Center(
+                  child: Container(
+                    width: 410,
+                    height: 300,
+                    child: Center(
+                      child: GestureDetector(
+                        onTap: () => Geolocator.openLocationSettings(),
+                        child: Container(
+                          height: 120,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.green,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Center(
+                            child: Text(
+                              "Enable location settings to see restaurants near you",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 28.0
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+
+                          )
+                        )
+                      )
                     ),
-                  )
+                  ),
+                )
+              : _currentPosition == null
+                  ? Center(
+                      child: Container(
+                        width: double.infinity,
+                        height: 300,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8.0),
+                          border: Border.all(width: 1.0),
+                        ),
+                        child: Center(
+                            child:
+                                CircularProgressIndicator(color: Colors.black)),
+                      ),
+                    )
                   : Container(
                       width: double.infinity,
                       height: 300,
@@ -184,7 +232,7 @@ class _HomePageState extends State<HomePage> {
                             initialCameraPosition: CameraPosition(
                                 target: _currentPosition!, zoom: 16),
                             markers: _markers
-                              // TODO: insert list of nearby restaurants as markers here
+                            // TODO: insert list of nearby restaurants as markers here
                             ,
                             myLocationEnabled: true,
                             myLocationButtonEnabled: true,
@@ -204,43 +252,58 @@ class _HomePageState extends State<HomePage> {
                 height: 20,
               ),
 
-              Center(
+              
+              locationDisabled 
+              ? SizedBox()
+              : Center(
                 child: Text('Restaurants near me',
                     style:
                         TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold)),
               ),
 
-              SizedBox(
-                height: 20
-              ),
+              SizedBox(height: 20),
 
               // displays list of nearby restaurants
-              nearbyRestaurants == null ? 
-                Center(
-                  // child: Container(
-                  //   height: 50,
-                  //   child: CircularProgressIndicator(),
-                  // ),
-                ) :
-                Container(
-                  height: 250,
-                  child: ListView.separated(
-                    separatorBuilder: (BuildContext context, int index) => 
-                      const Divider(color: Colors.black, thickness: 0.5, height: 0.0),
-                    shrinkWrap: true,
-                    itemCount: nearbyRestaurants!.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(nearbyRestaurants![index]['name']),
-                        subtitle: Text(
-                          (RestaurantDataFetch.getDistance(_currentPosition!, nearbyRestaurants![index]['geolocation'])/1000)
-                            .toStringAsPrecision(2) + 'km away'
-                        ),
-                        trailing: Text(nearbyRestaurants![index]['cuisine']),
-                      );
-                    },
-                  ),
-                )
+              locationDisabled 
+                ? SizedBox()
+                : nearbyRestaurants == null
+                  ? Center(
+                      // child: Container(
+                      //   height: 50,
+                      //   child: CircularProgressIndicator(),
+                      // ),
+                      )
+                  : Container(
+                      height: 250,
+                      child: ListView.separated(
+                        separatorBuilder: (BuildContext context, int index) =>
+                            const Divider(
+                                color: Colors.black,
+                                thickness: 0.5,
+                                height: 0.0),
+                        shrinkWrap: true,
+                        itemCount: nearbyRestaurants!.length,
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                            title: Text(nearbyRestaurants![index].name),
+                            subtitle: Text((RestaurantDataFetch.getDistance(
+                                            _currentPosition!,
+                                            nearbyRestaurants![index]
+                                                .geolocation) /
+                                        1000)
+                                    .toStringAsPrecision(2) +
+                                'km away'),
+                            trailing: Text(nearbyRestaurants![index].cuisine),
+                            onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => RestaurantPage(
+                                        restaurant:
+                                            nearbyRestaurants![index]))),
+                          );
+                        },
+                      ),
+                    )
             ]),
           )),
         ));

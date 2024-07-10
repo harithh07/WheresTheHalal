@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async';
+import 'package:url_launcher/url_launcher.dart';
 
 class RestaurantPage extends StatefulWidget {
 
@@ -18,6 +21,20 @@ class RestaurantPage extends StatefulWidget {
 class _RestaurantPageState extends State<RestaurantPage> {
 
   final Completer<GoogleMapController> _mapController = Completer();
+
+  // launch location in google maps to find directions
+  void launchMap() async {
+    String query = Uri.encodeComponent(widget.restaurant.name + " " + widget.restaurant.location);
+    Uri url = Uri.parse("https://www.google.com/maps/search/?api=1&query=$query");
+    
+    // if (Platform.isIOS) {
+    //   url = Uri.parse("http://maps.apple.com/?q=$query");
+    // }
+
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    }
+}
   
   
 
@@ -83,15 +100,20 @@ class _RestaurantPageState extends State<RestaurantPage> {
           Row(
             children: [
               SizedBox(width: 20.0),
-              Icon(Icons.location_on),
-              SizedBox(width: 6.0),
+              Icon(Icons.location_on, size: 28),
+              SizedBox(width: 8.0),
               Text(
                 widget.restaurant.location,
                 style: TextStyle(
                   color: Colors.black,
-                  fontSize: 16.0
+                  fontSize: 18.0
                 )
               ),
+              SizedBox(width: 8.0),
+              GestureDetector(
+                child: Icon(Icons.directions, size: 30),
+                onTap: () => launchMap()
+              )
             ]
           ),
 

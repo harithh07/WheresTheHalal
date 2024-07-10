@@ -113,7 +113,7 @@ class _SearchPageState extends State<SearchPage> {
             builder: (context) {
               return IconButton(
                   // opens filter page
-                  onPressed: () => filterResults(context), //Scaffold.of(context).openEndDrawer(),
+                  onPressed: () => filterResults(context),
                   icon: Icon(Icons.filter_alt_rounded),
                   iconSize: 36,
                 );
