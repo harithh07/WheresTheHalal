@@ -167,6 +167,7 @@ class _HomePageState extends State<HomePage> {
                         fontWeight: FontWeight.bold)),
               ),
               const SizedBox(height: 25),
+              
               // check if location services are denied
               // if denied, display button to open location settings
               // if not, check if current position has been obtained
