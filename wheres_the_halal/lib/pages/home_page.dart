@@ -92,7 +92,7 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       nearbyRestaurants = [];
     });
-    print("fetching neaby restaurants");
+    print("fetching nearby restaurants");
     await RestaurantDataFetch.getClientStream();
     List temp = await RestaurantDataFetch.getRestaurantsInRadius(
         3000, _currentPosition!);
@@ -119,6 +119,7 @@ class _HomePageState extends State<HomePage> {
           infoWindow: InfoWindow(
               title: restaurant.name, snippet: restaurant.location)));
     }
+
     print("Markers fetched: ${markerSet.length}");
     setState(() {
       _markers = markerSet;
@@ -293,7 +294,9 @@ class _HomePageState extends State<HomePage> {
                                         1000)
                                     .toStringAsPrecision(2) +
                                 'km away'),
-                            trailing: Text(nearbyRestaurants![index].cuisine),
+                            trailing: nearbyRestaurants![index].cuisine != null
+                              ? Text(nearbyRestaurants![index].cuisine)
+                              : Text(""),
                             onTap: () => Navigator.push(
                                 context,
                                 MaterialPageRoute(

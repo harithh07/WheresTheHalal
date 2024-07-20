@@ -49,7 +49,9 @@ class _FilterPageState extends State<FilterPage> {
           // filter buttons for each cuisine
           Wrap(
             children: 
-              widget.cuisines.map((cuisine) => Padding(
+              widget.cuisines.map((cuisine) => 
+              cuisine != null
+              ? Padding(
                 padding: const EdgeInsets.only(left: 4.0, right: 4.0, top: 2.0),
                 child: FilterChip(
                   label: Text(cuisine, style: TextStyle(color: Colors.black)), 
@@ -67,7 +69,10 @@ class _FilterPageState extends State<FilterPage> {
                   selectedColor: Colors.green,
                   side: BorderSide(color: Colors.black)
                 )
-              )).toList()
+              )
+              : SizedBox())
+            .toList()
+              
           ),
 
           SizedBox(height: 25.0),

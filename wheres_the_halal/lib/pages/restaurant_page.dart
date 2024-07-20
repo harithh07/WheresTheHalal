@@ -24,8 +24,9 @@ class _RestaurantPageState extends State<RestaurantPage> {
 
   // launch location in google maps to find directions
   void launchMap() async {
-    String query = Uri.encodeComponent(widget.restaurant.name + " " + widget.restaurant.location);
-    Uri url = Uri.parse("https://www.google.com/maps/search/?api=1&query=$query");
+    String query = Uri.encodeComponent(widget.restaurant.name + ", " + widget.restaurant.location);
+    String query_place_id = Uri.encodeComponent(widget.restaurant.place_id);
+    Uri url = Uri.parse("https://www.google.com/maps/search/?api=1&query=$query&query_place_id=$query_place_id");
     
     // if (Platform.isIOS) {
     //   url = Uri.parse("http://maps.apple.com/?q=$query");
@@ -75,24 +76,26 @@ class _RestaurantPageState extends State<RestaurantPage> {
           SizedBox(height: 10.0),
           
           // cuisine
-          Padding(
-            padding: const EdgeInsets.only(left: 20.0),
-            child: Container(
-              padding: EdgeInsets.only(left: 8.0, right: 8.0, top: 4.0, bottom: 4.0),
-              child: Text(
-                widget.restaurant.cuisine,
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 20.0
+          widget.restaurant.cuisine != null 
+            ? Padding(
+              padding: const EdgeInsets.only(left: 20.0),
+              child: Container(
+                padding: EdgeInsets.only(left: 8.0, right: 8.0, top: 4.0, bottom: 4.0),
+                child: Text(
+                  widget.restaurant.cuisine,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 20.0
+                  )
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.0),
+                  color: Colors.green
+                  
                 )
               ),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8.0),
-                color: Colors.green
-                
-              )
-            ),
-          ),
+            )
+            : SizedBox(height: 10.0),
 
           SizedBox(height: 12.0),
 
@@ -154,7 +157,6 @@ class _RestaurantPageState extends State<RestaurantPage> {
                     Marker(
                       markerId: MarkerId(widget.restaurant.name),
                       position: LatLng(widget.restaurant.geolocation.latitude, widget.restaurant.geolocation.longitude),
-                      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan)
                       
                     )
                   },

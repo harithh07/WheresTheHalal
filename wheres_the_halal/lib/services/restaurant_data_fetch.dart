@@ -9,28 +9,51 @@ class RestaurantDataFetch {
 
   final CollectionReference restaurantCollection = FirebaseFirestore.instance.collection('restaurants');
 
-  static List temp = [];
-  static List allResults = [];
+  static List _temp = [];
+  static List _allResults = [];
 
   static getClientStream() async {
     // order restaurants by name, then by location name
-    allResults = [];
-    var data = await FirebaseFirestore.instance.collection('restaurants').orderBy('name').orderBy('location').get();
+    _allResults = [];
+    var data = await FirebaseFirestore.instance.collection('restaurants 2.0').orderBy('name').orderBy('location').get();
 
-    temp = data.docs;
-    for (var doc in temp) {
-      allResults.add(Restaurant(name: doc['name'], cuisine: doc['cuisine'], address: doc['address'], location: doc['location'], geolocation: doc['geolocation']));
+    _temp = data.docs;
+    for (var doc in _temp) {
+      try {
+        _allResults.add(Restaurant(
+          name: doc['name'], 
+          cuisine: doc['cuisine'], 
+          address: doc['address'], 
+          location: doc['location'], 
+          geolocation: doc['geolocation'],
+          place_id: doc['place_id']
+        ));
+      // TODO: PLACEHOLDER 
+      } catch (e) {
+          _allResults.add(Restaurant(
+            name: doc['name'], 
+            address: doc['address'], 
+            location: doc['location'], 
+            geolocation: doc['geolocation'],
+            place_id: doc['place_id']),
+          );
+          
+      }
     }
+  }
+
+  static getAllResults() {
+    return _allResults;
   }
 
   static Future<List> getRestaurantsInRadius(double radius, LatLng currentPosition) async {
     List nearbyResults = [];
 
-    if (temp.isEmpty) {
+    if (_temp.isEmpty) {
       return [];
     }
     else {
-      for (var restaurant in allResults) {
+      for (var restaurant in _allResults) {
         double dist = getDistance(currentPosition, restaurant.geolocation);
         if (dist <= radius) {
                 nearbyResults.add(restaurant);

@@ -4,6 +4,7 @@ import 'package:wheres_the_halal/components/menu_drawer.dart';
 import 'package:wheres_the_halal/components/restaurant.dart';
 import 'package:wheres_the_halal/pages/filter_page.dart';
 import 'package:wheres_the_halal/pages/restaurant_page.dart';
+import 'package:wheres_the_halal/services/restaurant_data_fetch.dart';
 
 
 class SearchPage extends StatefulWidget {
@@ -25,13 +26,20 @@ class _SearchPageState extends State<SearchPage> {
   List cuisinesList = [];
   List selectedCuisines = [];
 
-  getClientStream() async {
+  initList() async {
+    setState(() {
+      _allResults = [];
+    });
     // order restaurants by name, then by location name
-    var data = await FirebaseFirestore.instance.collection('restaurants').orderBy('name').orderBy('location').get();
+    await RestaurantDataFetch.getClientStream();
+
+    List temp = RestaurantDataFetch.getAllResults();
+    // var data = await FirebaseFirestore.instance.collection('restaurants').orderBy('name').orderBy('location').get();
 
     setState(() {
-      _allResults = data.docs;
+      _allResults = temp;
     });
+    print(_allResults.length);
     searchResultList();
   }
 
@@ -45,19 +53,19 @@ class _SearchPageState extends State<SearchPage> {
   searchResultList() {
     var showResults = [];
     if (_textController != '') {
-      for (var clientSnapshot in _allResults) {
-        var name = clientSnapshot['name'].toString().toLowerCase();
-        var cuisine = clientSnapshot['cuisine'];
+      for (var restaurant in _allResults) {
+        var name = restaurant.name.toString().toLowerCase();
+        var cuisine = restaurant.cuisine;
         if (!cuisinesList.contains(cuisine)) {
           cuisinesList.add(cuisine);
         }
         if (!selectedCuisines.isEmpty) {
           if (name.contains(_textController.text.toLowerCase()) && selectedCuisines.contains(cuisine)) {
-            showResults.add(clientSnapshot);
+            showResults.add(restaurant);
           }
         } else {
           if (name.contains(_textController.text.toLowerCase())) {
-            showResults.add(clientSnapshot);
+            showResults.add(restaurant);
           }
         }
       }
@@ -92,7 +100,7 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   void didChangeDependencies() {
-    getClientStream();
+    initList();
     super.didChangeDependencies();
   }
 
@@ -170,19 +178,15 @@ class _SearchPageState extends State<SearchPage> {
             //   radius: 25.0,
             //   backgroundColor: Colors.grey,
             // ),
-            title: Text(_resultList[index]['name'],),
-            subtitle: Text(_resultList[index]['location']),
-            trailing: Text(_resultList[index]['cuisine']),
+            title: Text(_resultList[index].name,),
+            subtitle: Text(_resultList[index].location),
+            trailing: _resultList[index].cuisine != null
+                        ? Text(_resultList[index].cuisine)
+                        : Text(""),
             onTap: () => 
               Navigator.push(context, MaterialPageRoute(builder: (context) => 
-                RestaurantPage(restaurant: Restaurant(
-                  name: _resultList[index]['name'], 
-                  cuisine: _resultList[index]['cuisine'], 
-                  address: _resultList[index]['address'],
-                  location: _resultList[index]['location'], 
-                  geolocation: _resultList[index]['geolocation'])))
-                )
-          );
+                RestaurantPage(restaurant: _resultList[index]))
+          ));
         },
       )
     );
