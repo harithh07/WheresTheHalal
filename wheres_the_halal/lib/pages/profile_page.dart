@@ -15,7 +15,6 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final user = FirebaseAuth.instance.currentUser!;
 
   final String pageName = 'Profile';
 
@@ -23,14 +22,14 @@ class _ProfilePageState extends State<ProfilePage> {
     FirebaseAuth.instance.signOut();
   }
 
-  final currentUser = FirebaseAuth.instance.currentUser!;
+  final _currentUser = FirebaseAuth.instance.currentUser!;
 
   // all users
   final usersCollection = FirebaseFirestore.instance.collection("Users");
 
   // edit field method
   Future<void> editField(String field) async {
-    String newVal = "";
+    String _newVal = "";
     await showDialog(
       context: context, 
       builder: (context) => AlertDialog(
@@ -47,7 +46,7 @@ class _ProfilePageState extends State<ProfilePage> {
             hintStyle: TextStyle(color: Colors.grey)
           ),
           onChanged: (value) {
-            newVal = value;
+            _newVal = value;
           },
           autocorrect: false,
         ),
@@ -66,7 +65,7 @@ class _ProfilePageState extends State<ProfilePage> {
               'Save',
               style: TextStyle(color: Colors.white, fontSize: 16.0),
             ),
-            onPressed: () => Navigator.of(context).pop(newVal),
+            onPressed: () => Navigator.of(context).pop(_newVal),
           ),
         ],
       ),
@@ -74,9 +73,9 @@ class _ProfilePageState extends State<ProfilePage> {
     );
 
     // update in firestore
-    if (newVal.trim().length > 0) {
+    if (_newVal.trim().length > 0) {
       // only update if field is non empty
-      await usersCollection.doc(currentUser.email!).update({field: newVal});
+      await usersCollection.doc(_currentUser.email!).update({field: _newVal});
     }
   }
 
@@ -109,7 +108,7 @@ class _ProfilePageState extends State<ProfilePage> {
       
       // body
       body: StreamBuilder<DocumentSnapshot>(
-        stream: FirebaseFirestore.instance.collection("Users").doc(currentUser.email!).snapshots(),
+        stream: FirebaseFirestore.instance.collection("Users").doc(_currentUser.email!).snapshots(),
         builder: (context, snapshot) {
           // get user data
           if (snapshot.hasData) {
@@ -128,7 +127,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
                 // current user
                 Text(
-                  currentUser.email!,
+                  _currentUser.email!,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.black,

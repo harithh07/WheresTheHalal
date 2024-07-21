@@ -16,9 +16,9 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   // text editing controllers
-  final emailController = TextEditingController();
+  final _emailController = TextEditingController();
 
-  final passwordController = TextEditingController();
+  final _passwordController = TextEditingController();
 
   // sign user in method
   void signUserIn() async {
@@ -35,8 +35,8 @@ class _LoginPageState extends State<LoginPage> {
     // try sign in
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: emailController.text,
-      password: passwordController.text,
+      email: _emailController.text,
+      password: _passwordController.text,
       );
       // pop loading circle
       Navigator.pop(context);
@@ -92,7 +92,7 @@ class _LoginPageState extends State<LoginPage> {
               // email textfield
               LoginTextfield(
                 key: Key('email_controller'),
-                controller: emailController,
+                controller: _emailController,
                 hintText: 'Email',
                 obscureText: false,
               ),
@@ -102,7 +102,7 @@ class _LoginPageState extends State<LoginPage> {
               // password textfield
               LoginTextfield(
                 key: Key('pw_controller'),
-                controller: passwordController,
+                controller: _passwordController,
                 hintText: 'Password',
                 obscureText: true,
               ),

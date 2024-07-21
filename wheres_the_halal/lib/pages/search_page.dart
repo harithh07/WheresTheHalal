@@ -23,8 +23,8 @@ class _SearchPageState extends State<SearchPage> {
 
   List _allResults = [];
   List _resultList = [];
-  List cuisinesList = [];
-  List selectedCuisines = [];
+  List _cuisinesList = [];
+  List _selectedCuisines = [];
 
   initList() async {
     setState(() {
@@ -56,11 +56,11 @@ class _SearchPageState extends State<SearchPage> {
       for (var restaurant in _allResults) {
         var name = restaurant.name.toString().toLowerCase();
         var cuisine = restaurant.cuisine;
-        if (!cuisinesList.contains(cuisine)) {
-          cuisinesList.add(cuisine);
+        if (!_cuisinesList.contains(cuisine)) {
+          _cuisinesList.add(cuisine);
         }
-        if (!selectedCuisines.isEmpty) {
-          if (name.contains(_textController.text.toLowerCase()) && selectedCuisines.contains(cuisine)) {
+        if (!_selectedCuisines.isEmpty) {
+          if (name.contains(_textController.text.toLowerCase()) && _selectedCuisines.contains(cuisine)) {
             showResults.add(restaurant);
           }
         } else {
@@ -80,8 +80,8 @@ class _SearchPageState extends State<SearchPage> {
 
   // function to open filter page and pass all unique cuisines and currently filtered cuisines 
   Future<void> filterResults(BuildContext context) async {
-    final filters = await Navigator.push(context, MaterialPageRoute(builder: (context) => FilterPage(cuisines: cuisinesList, filters: selectedCuisines,)));
-    selectedCuisines = filters;
+    final filters = await Navigator.push(context, MaterialPageRoute(builder: (context) => FilterPage(cuisines: _cuisinesList, filters: _selectedCuisines,)));
+    _selectedCuisines = filters;
     searchResultList();
   }
 
@@ -182,7 +182,7 @@ class _SearchPageState extends State<SearchPage> {
             subtitle: Text(_resultList[index].location),
             trailing: _resultList[index].cuisine != null
                         ? Text(_resultList[index].cuisine)
-                        : Text(""),
+                              : Text(""),
             onTap: () => 
               Navigator.push(context, MaterialPageRoute(builder: (context) => 
                 RestaurantPage(restaurant: _resultList[index]))

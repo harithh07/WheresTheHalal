@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_rating/flutter_rating.dart';
@@ -43,6 +44,19 @@ class _RestaurantPageState extends State<RestaurantPage> {
     }
   }
 
+  void launchPhone() async {
+    if (widget.restaurant.contact is! double) {
+      String _contactNumber = widget.restaurant.contact;
+      String query = Uri.encodeComponent(_contactNumber);
+
+      Uri url = Uri.parse('tel: +65 $query');
+
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url);
+      }
+    }
+  }
+
   // launch all reviews in google
   void launchReviews() async {
     String query = Uri.encodeComponent(
@@ -67,7 +81,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
       final Map<String, dynamic> data = json.decode(response.body);
       setState(() {
         _reviews = data['result']['reviews'];
-        _rating = data['result']['rating'];
+        _rating = data['result']['rating'].toDouble();
       });
     } else {
       throw Exception("Failed to load reviews");
@@ -122,7 +136,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
                 // cuisine
                 widget.restaurant.cuisine != null
                     ? Padding(
-                        padding: const EdgeInsets.only(left: 20.0),
+                        padding: const EdgeInsets.only(left: 40.0),
                         child: Container(
                             padding: EdgeInsets.only(
                                 left: 8.0, right: 8.0, top: 4.0, bottom: 4.0),
@@ -150,8 +164,32 @@ class _RestaurantPageState extends State<RestaurantPage> {
                       onTap: () => launchMap())
                 ]),
 
-                SizedBox(height: 20.0),
+                SizedBox(height: 10.0),
 
+                // contact number
+                Center(
+                  child: widget.restaurant.contact is! double 
+                    ? Container(
+                        width: 350.0,
+                        child: GestureDetector(
+                          // open contact number in phone app
+                          onTap: () => launchPhone(),
+                          child: Text(
+                            widget.restaurant.contact,
+                            style: TextStyle(
+                              fontSize: 18.0,
+                              //fontWeight: FontWeight.bold,
+                              color: Colors.blue
+                            )
+                          ),
+                        )
+                      )
+                    : SizedBox(height: 0)
+                ),
+
+                SizedBox(height: 10.0),
+
+                // restaurant overall rating
                 Container(
                     width: 225,
                     child: _rating != null
@@ -205,20 +243,21 @@ class _RestaurantPageState extends State<RestaurantPage> {
                   height: 25,
                 ),
 
+                // google reviews
                 Center(
-                  child: Container(
-                      width: 400,
-                      child: Text('Reviews',
-                          style: TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.green))),
+                  child: Text('Reviews',
+                      style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green)),
                 ),
 
                 SizedBox(height: 10),
+                
+                Divider(color: Colors.black, thickness: 1, height: 0.0),
 
                 Container(
-                  height: 400,
+                  height: 425,
                   child: ListView.separated(
                       itemCount: _reviews.length,
                       shrinkWrap: true,
@@ -238,10 +277,13 @@ class _RestaurantPageState extends State<RestaurantPage> {
                                 ]));
                       }),
                 ),
+                Divider(color: Colors.black, thickness: 1, height: 0.0),
 
                 SizedBox(height: 50),
 
-                MyButton(onTap: () => launchReviews(), text: 'More reviews')
+                MyButton(onTap: () => launchReviews(), text: 'More reviews'),
+
+                SizedBox(height: 10)
             ])
           ],
         ));

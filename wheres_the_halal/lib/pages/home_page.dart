@@ -20,14 +20,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final user = FirebaseAuth.instance.currentUser!;
+  final _user = FirebaseAuth.instance.currentUser!;
 
   // location
   final Completer<GoogleMapController> _mapController = Completer();
   LatLng? _currentPosition;
-  List? nearbyRestaurants;
+  List? _nearbyRestaurants;
   Set<Marker> _markers = {};
-  bool locationDisabled = false;
+  bool _locationDisabled = false;
+  int? _numOfNearbyRestaurants = 0;
 
   final String pageName = 'Home';
 
@@ -63,7 +64,7 @@ class _HomePageState extends State<HomePage> {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
         setState(() {
-          locationDisabled = true;
+          _locationDisabled = true;
         });
         return Future.error('Location permissions are denied');
       }
@@ -71,7 +72,7 @@ class _HomePageState extends State<HomePage> {
 
     if (permission == LocationPermission.deniedForever) {
       setState(() {
-        locationDisabled = true;
+        _locationDisabled = true;
       });
       return Future.error('Location permissions are permanently denied');
     }
@@ -79,7 +80,7 @@ class _HomePageState extends State<HomePage> {
     Position pos = await Geolocator.getCurrentPosition();
 
     setState(() {
-      locationDisabled = false;
+      _locationDisabled = false;
       _currentPosition = LatLng(pos.latitude, pos.longitude);
     });
 
@@ -90,7 +91,7 @@ class _HomePageState extends State<HomePage> {
   // fetches list of restaurants in a 3km radius from user
   Future<void> fetchNearbyRestaurants() async {
     setState(() {
-      nearbyRestaurants = [];
+      _nearbyRestaurants = [];
     });
     print("fetching nearby restaurants");
     await RestaurantDataFetch.getClientStream();
@@ -98,7 +99,8 @@ class _HomePageState extends State<HomePage> {
         3000, _currentPosition!);
 
     setState(() {
-      nearbyRestaurants = temp;
+      _nearbyRestaurants = temp;
+      _numOfNearbyRestaurants = _nearbyRestaurants?.length;
     });
   }
 
@@ -117,7 +119,13 @@ class _HomePageState extends State<HomePage> {
           position: LatLng(restaurant.geolocation.latitude,
               restaurant.geolocation.longitude),
           infoWindow: InfoWindow(
-              title: restaurant.name, snippet: restaurant.location)));
+              title: restaurant.name, 
+              snippet: restaurant.location, 
+              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => RestaurantPage(
+                                        restaurant: restaurant))))));
     }
 
     print("Markers fetched: ${markerSet.length}");
@@ -167,13 +175,13 @@ class _HomePageState extends State<HomePage> {
                         fontWeight: FontWeight.bold)),
               ),
               const SizedBox(height: 25),
-              
+
               // check if location services are denied
               // if denied, display button to open location settings
               // if not, check if current position has been obtained
               // if current position is still null, display a loading circle until it is not null
               // if not null, display google maps widget
-              locationDisabled
+              _locationDisabled
               ? Center(
                   child: Container(
                     width: 410,
@@ -255,20 +263,28 @@ class _HomePageState extends State<HomePage> {
               ),
 
               
-              locationDisabled 
+              _locationDisabled 
               ? SizedBox()
               : Center(
-                child: Text('Restaurants near me',
-                    style:
-                        TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold)),
+                child: Column(
+                  children: [
+                    Text('Restaurants near me',
+                        style:
+                            TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold)
+                        ),
+                    SizedBox(height: 3),
+
+                    Text('$_numOfNearbyRestaurants restaurants nearby')
+                  ],
+                ),
               ),
 
-              SizedBox(height: 20),
+              SizedBox(height: 10),
 
               // displays list of nearby restaurants
-              locationDisabled 
+              _locationDisabled 
                 ? SizedBox()
-                : nearbyRestaurants == null
+                : _nearbyRestaurants == null
                   ? Center(
                       // child: Container(
                       //   height: 50,
@@ -284,26 +300,26 @@ class _HomePageState extends State<HomePage> {
                                 thickness: 0.5,
                                 height: 0.0),
                         shrinkWrap: true,
-                        itemCount: nearbyRestaurants!.length,
+                        itemCount: _nearbyRestaurants!.length,
                         itemBuilder: (context, index) {
                           return ListTile(
-                            title: Text(nearbyRestaurants![index].name),
+                            title: Text(_nearbyRestaurants![index].name),
                             subtitle: Text((RestaurantDataFetch.getDistance(
                                             _currentPosition!,
-                                            nearbyRestaurants![index]
+                                            _nearbyRestaurants![index]
                                                 .geolocation) /
                                         1000)
                                     .toStringAsPrecision(2) +
                                 'km away'),
-                            trailing: nearbyRestaurants![index].cuisine != null
-                              ? Text(nearbyRestaurants![index].cuisine)
+                            trailing: _nearbyRestaurants![index].cuisine != null
+                              ? Text(_nearbyRestaurants![index].cuisine)
                               : Text(""),
                             onTap: () => Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => RestaurantPage(
                                         restaurant:
-                                            nearbyRestaurants![index]))),
+                                            _nearbyRestaurants![index]))),
                           );
                         },
                       ),

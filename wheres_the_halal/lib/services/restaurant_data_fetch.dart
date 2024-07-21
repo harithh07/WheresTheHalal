@@ -26,7 +26,9 @@ class RestaurantDataFetch {
           address: doc['address'], 
           location: doc['location'], 
           geolocation: doc['geolocation'],
-          place_id: doc['place_id']
+          place_id: doc.id,
+          contact: doc['contact_number']
+
         ));
       // TODO: PLACEHOLDER 
       } catch (e) {
@@ -35,7 +37,9 @@ class RestaurantDataFetch {
             address: doc['address'], 
             location: doc['location'], 
             geolocation: doc['geolocation'],
-            place_id: doc['place_id']),
+            place_id: doc.id,
+            contact: doc['contact_number']
+          ),
           );
           
       }

@@ -7,6 +7,7 @@ class Restaurant {
   String location;
   GeoPoint geolocation;
   String place_id;
+  var contact;
 
 
   Restaurant({
@@ -15,7 +16,8 @@ class Restaurant {
     required this.address,
     required this.location,
     required this.geolocation,
-    required this.place_id
+    required this.place_id,
+    required this.contact
   });
 
   

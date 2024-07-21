@@ -7,7 +7,7 @@ class SettingsPage extends StatelessWidget {
 
   SettingsPage({super.key});
 
-  final user = FirebaseAuth.instance.currentUser!;
+  final _user = FirebaseAuth.instance.currentUser!;
   final String pageName = 'Settings';
 
   void signUserOut() {

@@ -16,9 +16,9 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   // text editing controllers
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
-  final confirmPasswordController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
 
   // sign user up method
   void signUserUp() async {
@@ -34,17 +34,17 @@ class _RegisterPageState extends State<RegisterPage> {
 
     // try creating user
     try {
-      if (passwordController.text == confirmPasswordController.text) {
+      if (_passwordController.text == _confirmPasswordController.text) {
         UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: emailController.text,
-          password: passwordController.text,
+          email: _emailController.text,
+          password: _passwordController.text,
         );
 
         // add user to firebase
         FirebaseFirestore.instance.collection("Users")
           .doc(userCredential.user!.email)
           .set({
-            'username': emailController.text.split('@')[0], // initial username
+            'username': _emailController.text.split('@')[0], // initial username
           });
         Navigator.pop(context);
       } else {
@@ -105,7 +105,7 @@ class _RegisterPageState extends State<RegisterPage> {
             
               // email textfield
               LoginTextfield(
-                controller: emailController,
+                controller: _emailController,
                 hintText: 'Email',
                 obscureText: false,
               ),
@@ -114,7 +114,7 @@ class _RegisterPageState extends State<RegisterPage> {
             
               // password textfield
               LoginTextfield(
-                controller: passwordController,
+                controller: _passwordController,
                 hintText: 'Password',
                 obscureText: true,
               ),
@@ -123,7 +123,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
               // confirm password textfield
               LoginTextfield(
-                controller: confirmPasswordController,
+                controller: _confirmPasswordController,
                 hintText: 'Confirm Password',
                 obscureText: true,
               ),
