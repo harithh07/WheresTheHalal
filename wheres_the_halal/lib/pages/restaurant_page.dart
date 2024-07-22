@@ -1,6 +1,8 @@
 import 'dart:convert';
-import 'dart:ffi';
+import 'dart:ui';
 
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating/flutter_rating.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -25,6 +27,8 @@ class RestaurantPage extends StatefulWidget {
 class _RestaurantPageState extends State<RestaurantPage> {
   final Completer<GoogleMapController> _mapController = Completer();
   List _reviews = [];
+  List _mostRelevantReviews = [];
+  List _newestReviews = [];
   double? _rating;
 
   // launch location in google maps to find directions
@@ -80,8 +84,22 @@ class _RestaurantPageState extends State<RestaurantPage> {
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
       setState(() {
-        _reviews = data['result']['reviews'];
+        _mostRelevantReviews = data['result']['reviews'];
+        _reviews = _mostRelevantReviews;
         _rating = data['result']['rating'].toDouble();
+      });
+    } else {
+      throw Exception("Failed to load reviews");
+    }
+
+    final newRequest =
+        'https://maps.googleapis.com/maps/api/place/details/json?place_id=$queryPlaceId&reviews_sort=newest&key=$apiKey&fields=name,rating,reviews';
+    final newResponse = await http.get(Uri.parse(newRequest));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = json.decode(newResponse.body);
+      setState(() {
+        _newestReviews = data['result']['reviews'];
       });
     } else {
       throw Exception("Failed to load reviews");
@@ -153,7 +171,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
 
                 // location
                 Row(children: [
-                  SizedBox(width: 32.0),
+                  SizedBox(width: 35.0),
                   Icon(Icons.location_on, size: 28),
                   SizedBox(width: 8.0),
                   Text(widget.restaurant.location,
@@ -167,25 +185,23 @@ class _RestaurantPageState extends State<RestaurantPage> {
                 SizedBox(height: 10.0),
 
                 // contact number
-                Center(
-                  child: widget.restaurant.contact is! double 
-                    ? Container(
-                        width: 350.0,
-                        child: GestureDetector(
-                          // open contact number in phone app
-                          onTap: () => launchPhone(),
-                          child: Text(
-                            widget.restaurant.contact,
-                            style: TextStyle(
-                              fontSize: 18.0,
-                              //fontWeight: FontWeight.bold,
-                              color: Colors.blue
-                            )
-                          ),
-                        )
+                widget.restaurant.contact is! double 
+                  ? Padding(
+                      padding: EdgeInsets.only(left: 40.0),
+                      child: GestureDetector(
+                        // open contact number in phone app
+                        onTap: () => launchPhone(),
+                        child: Text(
+                          widget.restaurant.contact,
+                          style: TextStyle(
+                            fontSize: 18.0,
+                            //fontWeight: FontWeight.bold,
+                            color: Colors.blue
+                          )
+                        ),
                       )
-                    : SizedBox(height: 0)
-                ),
+                    )
+                  : SizedBox(height: 0),
 
                 SizedBox(height: 10.0),
 
@@ -244,7 +260,8 @@ class _RestaurantPageState extends State<RestaurantPage> {
                 ),
 
                 // google reviews
-                Center(
+                Padding(
+                  padding: EdgeInsets.only(left: 15.0),
                   child: Text('Reviews',
                       style: TextStyle(
                           fontSize: 24,
@@ -252,10 +269,58 @@ class _RestaurantPageState extends State<RestaurantPage> {
                           color: Colors.green)),
                 ),
 
+                SizedBox(height: 5),
+
+                Padding(
+                  padding: const EdgeInsets.only(left: 15.0),
+                  child: Row(
+                    children: [
+                      Text(
+                        'Sort by', 
+                        style: TextStyle(
+                          fontSize: 16
+                        ),
+                      ),
+                      SizedBox(width: 8),
+
+                      DropdownMenu(
+                        onSelected: (val) {
+                          setState(() {
+                            _reviews = val!;
+                          });
+                        },
+                        dropdownMenuEntries: [
+                          DropdownMenuEntry(
+                            value: _mostRelevantReviews, 
+                            label: 'Most relevant'
+                          ),
+                          DropdownMenuEntry(
+                            value: _newestReviews, 
+                            label: 'Newest'
+                          )
+                        ],
+                        width: 175,
+                        initialSelection: _mostRelevantReviews,
+                        inputDecorationTheme: InputDecorationTheme(
+                          contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                          isDense: true,
+                          constraints: BoxConstraints.tight(Size.fromHeight(35)),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8)
+                          )
+                        ),
+                        
+                        
+                      ),
+                    ],
+                  ),
+                ),
+
                 SizedBox(height: 10),
                 
                 Divider(color: Colors.black, thickness: 1, height: 0.0),
 
+                // list of reviews
                 Container(
                   height: 425,
                   child: ListView.separated(
@@ -267,12 +332,13 @@ class _RestaurantPageState extends State<RestaurantPage> {
                       itemBuilder: (context, index) {
                         final review = _reviews[index];
                         final rate = review['rating'];
+                        final time = review['relative_time_description'];
                         return ListTile(
                             title: Text(review['author_name']),
                             subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Rating: $rate / 5'),
+                                  Text('Rating: $rate / 5 - $time'),
                                   Text(review['text'], style: TextStyle(color: Colors.black))
                                 ]));
                       }),

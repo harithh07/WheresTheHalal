@@ -125,7 +125,9 @@ class _HomePageState extends State<HomePage> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => RestaurantPage(
-                                        restaurant: restaurant))))));
+                                      restaurant: restaurant
+                                      )
+                                    )))));
     }
 
     print("Markers fetched: ${markerSet.length}");
