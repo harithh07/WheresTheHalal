@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:wheres_the_halal/components/textbox.dart';
 import 'package:wheres_the_halal/pages/auth_page.dart';
 import 'package:wheres_the_halal/components/menu_drawer.dart';
+import 'package:wheres_the_halal/pages/forgot_pw_page.dart';
 
 class ProfilePage extends StatefulWidget {
 
@@ -139,7 +140,41 @@ class _ProfilePageState extends State<ProfilePage> {
                   text: userData['username'], 
                   sectionName: 'Username',
                   onPressed: () => editField('username')
-                )
+                ),
+
+                SizedBox(
+                height: 20,
+                  ),
+
+                Padding(
+                padding: const EdgeInsets.only(left: 20),
+                child: Row(
+                  
+                  children: [
+                    GestureDetector(
+                      key: Key('forgot_pw_button'),
+                      onTap: (){
+                        Navigator.push(
+                          context, 
+                          MaterialPageRoute(
+                            builder: (context){
+                              return ForgotPasswordPage();
+                            },
+                          ),
+                        );
+                      },
+                      child: Text(
+                        'Change Password',
+                          style: TextStyle(
+                            color: Colors.blue[500],
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               ],
             );
           } else if (snapshot.hasError) {
@@ -152,7 +187,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
           return Center(child: CircularProgressIndicator());
         }
-      )
+      ) 
     );
   }
 }
