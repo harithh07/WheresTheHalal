@@ -75,11 +75,11 @@ class _LoginPageState extends State<LoginPage> {
             child: Center(
           child: SingleChildScrollView(
             child: Column(children: [
-              const SizedBox(height: 50),
+              
               // logo
-              const Icon(Icons.lock, size: 100),
-            
-              const SizedBox(height: 50),
+              Image.asset("lib/images/wth logo.png", height: 300,),
+
+              
               // welcome back
               Text('Welcome back!',
                   style: TextStyle(
@@ -186,7 +186,7 @@ class _LoginPageState extends State<LoginPage> {
                       imagePath: 'lib/images/google.png', height: 64.0
                       )),
             
-              const SizedBox(height: 50),
+              const SizedBox(height: 20),
             
               // not a member? register now
               Row(
