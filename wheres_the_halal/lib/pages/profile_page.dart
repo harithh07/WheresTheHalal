@@ -113,7 +113,6 @@ class _ProfilePageState extends State<ProfilePage> {
           // get user data
           if (snapshot.hasData) {
             final userData = snapshot.data!.data() as Map<String, dynamic>;
-
             return ListView(
               children: [
                 const SizedBox(height: 50),

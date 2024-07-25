@@ -138,6 +138,7 @@ class _SearchPageState extends State<SearchPage> {
             ),
           child: TextField(
             controller: _textController,
+            autocorrect: false,
             decoration: InputDecoration(
               contentPadding: EdgeInsets.only(top: 4.0),
               // search icon, unfocuses textfield when pressed

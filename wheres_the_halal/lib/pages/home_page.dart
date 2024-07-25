@@ -115,7 +115,8 @@ class _HomePageState extends State<HomePage> {
 
     for (var restaurant in temp) {
       markerSet.add(Marker(
-          markerId: MarkerId(restaurant.name),
+          markerId: MarkerId(restaurant.place_id),
+          
           position: LatLng(restaurant.geolocation.latitude,
               restaurant.geolocation.longitude),
           infoWindow: InfoWindow(
@@ -134,6 +135,13 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _markers = markerSet;
     });
+  }
+
+  Future<void> refreshPage() async {
+    await fetchLocationUpdates();
+    final GoogleMapController _controller = await _mapController.future;
+    _controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target: _currentPosition!, zoom: 14.5)));
+
   }
 
   @override
@@ -161,7 +169,7 @@ class _HomePageState extends State<HomePage> {
 
         // Rest of homepage
         body: RefreshIndicator(
-          onRefresh: fetchLocationUpdates,
+          onRefresh: refreshPage,
           color: Colors.black,
           backgroundColor: Colors.green,
           child: SafeArea(
@@ -228,37 +236,39 @@ class _HomePageState extends State<HomePage> {
                                 CircularProgressIndicator(color: Colors.black)),
                       ),
                     )
-                  : Container(
-                      width: double.infinity,
-                      height: 300,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8.0),
-                        border: Border.all(width: 1.0),
+                  : Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                    child: Container(
+                        height: 300,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8.0),
+                          border: Border.all(width: 1.0),
+                        ),
+                        // ClipRRect to give GoogleMaps a rounded border
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8.0),
+                          child: GoogleMap(
+                              onMapCreated: ((GoogleMapController controller) =>
+                                  _mapController.complete(controller)),
+                              initialCameraPosition: CameraPosition(
+                                  target: _currentPosition!, zoom: 14.5),
+                              markers: _markers
+                              // TODO: insert list of nearby restaurants as markers here
+                              ,
+                              myLocationEnabled: true,
+                              myLocationButtonEnabled: true,
+                              scrollGesturesEnabled: true,
+                              zoomControlsEnabled: true, // Android only
+                              zoomGesturesEnabled: true,
+                              tiltGesturesEnabled: true,
+                              gestureRecognizers:
+                                  <Factory<OneSequenceGestureRecognizer>>[
+                                new Factory<OneSequenceGestureRecognizer>(
+                                    () => new EagerGestureRecognizer()),
+                              ].toSet()),
+                        ),
                       ),
-                      // ClipRRect to give GoogleMaps a rounded border
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8.0),
-                        child: GoogleMap(
-                            onMapCreated: ((GoogleMapController controller) =>
-                                _mapController.complete(controller)),
-                            initialCameraPosition: CameraPosition(
-                                target: _currentPosition!, zoom: 16),
-                            markers: _markers
-                            // TODO: insert list of nearby restaurants as markers here
-                            ,
-                            myLocationEnabled: true,
-                            myLocationButtonEnabled: true,
-                            scrollGesturesEnabled: true,
-                            zoomControlsEnabled: true, // Android only
-                            zoomGesturesEnabled: true,
-                            tiltGesturesEnabled: true,
-                            gestureRecognizers:
-                                <Factory<OneSequenceGestureRecognizer>>[
-                              new Factory<OneSequenceGestureRecognizer>(
-                                  () => new EagerGestureRecognizer()),
-                            ].toSet()),
-                      ),
-                    ),
+                  ),
 
               SizedBox(
                 height: 20,
@@ -304,15 +314,22 @@ class _HomePageState extends State<HomePage> {
                         shrinkWrap: true,
                         itemCount: _nearbyRestaurants!.length,
                         itemBuilder: (context, index) {
+                          String distDisplay = "";
+                          double dist = (RestaurantDataFetch.getDistance(
+                            _currentPosition!, 
+                            _nearbyRestaurants![index].geolocation
+                          ) / 1000);
+                          if (dist < 0.05) {
+                            distDisplay = "Less than 50m away";
+                          } else {
+                            distDisplay = dist.toStringAsPrecision(2) + " km away";
+                          }
+                          
                           return ListTile(
                             title: Text(_nearbyRestaurants![index].name),
-                            subtitle: Text((RestaurantDataFetch.getDistance(
-                                            _currentPosition!,
-                                            _nearbyRestaurants![index]
-                                                .geolocation) /
-                                        1000)
-                                    .toStringAsPrecision(2) +
-                                'km away'),
+                            subtitle: Text(
+                              distDisplay
+                            ),
                             trailing: _nearbyRestaurants![index].cuisine != null
                               ? Text(_nearbyRestaurants![index].cuisine)
                               : Text(""),

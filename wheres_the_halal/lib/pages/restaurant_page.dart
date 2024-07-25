@@ -1,8 +1,6 @@
 import 'dart:convert';
-import 'dart:ui';
 
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating/flutter_rating.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -50,8 +48,8 @@ class _RestaurantPageState extends State<RestaurantPage> {
 
   void launchPhone() async {
     if (widget.restaurant.contact is! double) {
-      String _contactNumber = widget.restaurant.contact;
-      String query = Uri.encodeComponent(_contactNumber);
+      String contactNumber = widget.restaurant.contact;
+      String query = Uri.encodeComponent(contactNumber);
 
       Uri url = Uri.parse('tel: +65 $query');
 
@@ -74,6 +72,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
     }
   }
 
+  // get reviews data from google place details request
   Future<void> getData() async {
     String queryPlaceId = Uri.encodeComponent(widget.restaurant.place_id);
     String apiKey = Uri.encodeComponent(Constants.google_api_key);
@@ -108,7 +107,6 @@ class _RestaurantPageState extends State<RestaurantPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     getData();
   }
@@ -125,7 +123,6 @@ class _RestaurantPageState extends State<RestaurantPage> {
           ),
         ),
         body: ListView(
-          // crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Column(
               crossAxisAlignment: CrossAxisAlignment.start, 
@@ -262,14 +259,28 @@ class _RestaurantPageState extends State<RestaurantPage> {
                 // google reviews
                 Padding(
                   padding: EdgeInsets.only(left: 15.0),
-                  child: Text('Reviews',
-                      style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green)),
+                  child: Row(
+                    children: [
+                      Text(
+                        'Reviews from ',
+                        style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.green
+                            )
+                      ),
+
+                      SizedBox(width: 3.0),
+
+                      Image.asset('lib/images/google.png', height: 40.0,), 
+
+                      
+                        
+                    ],
+                  ),
                 ),
 
-                SizedBox(height: 5),
+                SizedBox(height: 14),
 
                 Padding(
                   padding: const EdgeInsets.only(left: 15.0),
@@ -321,8 +332,21 @@ class _RestaurantPageState extends State<RestaurantPage> {
                 Divider(color: Colors.black, thickness: 1, height: 0.0),
 
                 // list of reviews
-                Container(
-                  height: 425,
+                _reviews.isEmpty
+                  ? Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 15.0),
+                    child: Center(child: 
+                      Text(
+                        'No reviews found',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16
+                        ),
+                        )
+                    ),
+                  )
+                  : LimitedBox(
+                  maxHeight: 425,
                   child: ListView.separated(
                       itemCount: _reviews.length,
                       shrinkWrap: true,
@@ -345,7 +369,7 @@ class _RestaurantPageState extends State<RestaurantPage> {
                 ),
                 Divider(color: Colors.black, thickness: 1, height: 0.0),
 
-                SizedBox(height: 50),
+                SizedBox(height: 35),
 
                 MyButton(onTap: () => launchReviews(), text: 'More reviews'),
 

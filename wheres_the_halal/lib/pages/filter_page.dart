@@ -27,9 +27,9 @@ class _FilterPageState extends State<FilterPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Drawer(
+    return Scaffold(
       backgroundColor: Colors.grey[300],
-      child: Column(
+      body: Column(
         children: [
           // drawer header
           Container(
