@@ -177,14 +177,18 @@ class _HomePageState extends State<HomePage> {
             child: ListView(children: [
               // App name
               const SizedBox(height: 15.0),
+              // Center(
+              //   child: Text('Where\'s The Halal',
+              //       style: TextStyle(
+              //           color: Colors.green[600],
+              //           fontSize: 36.0,
+              //           fontWeight: FontWeight.bold)),
+              // ),
+
               Center(
-                child: Text('Where\'s The Halal',
-                    style: TextStyle(
-                        color: Colors.green[600],
-                        fontSize: 36.0,
-                        fontWeight: FontWeight.bold)),
+                child: Image.asset("lib/images/wth_logo_name.png", height: 100,)
               ),
-              const SizedBox(height: 25),
+              const SizedBox(height: 15),
 
               // check if location services are denied
               // if denied, display button to open location settings
